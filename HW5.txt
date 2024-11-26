@@ -1,0 +1,53 @@
+﻿1.
+SELECT 
+    hw1.order_details.*,
+    (SELECT hw1.orders.customer_id 
+     FROM hw1.orders 
+     WHERE hw1.orders.id = hw1.order_details.order_id) AS customer_id
+FROM order_details;
+
+
+2.
+select * 
+from hw1.order_details 
+where hw1.order_details.order_id in (select id from hw1.orders where shipper_id = 3)
+
+
+3.
+SELECT subquery.order_id, AVG(subquery.quantity) AS average_quantity 
+   FROM ( SELECT * FROM order_details WHERE quantity > 10 ) AS subquery 
+GROUP BY subquery.order_id;
+
+
+4.
+WITH temp AS (
+    SELECT *
+    FROM order_details
+    WHERE quantity > 10
+)
+SELECT temp.order_id, AVG(temp.quantity) AS average_quantity
+FROM temp
+GROUP BY temp.order_id;
+
+
+5.
+use hw1;
+DROP FUNCTION IF EXISTS hw1.MYFUNC;
+
+
+DELIMITER $$
+CREATE FUNCTION MYFUNC (a FLOAT, b FLOAT)
+RETURNS FLOAT
+DETERMINISTIC
+no sql
+
+
+BEGIN
+    
+    RETURN a/b;
+END$$
+DELIMITER ;
+
+
+SELECT *, MYFUNC(hw1.order_details.quantity, 2) AS result
+FROM order_details;
